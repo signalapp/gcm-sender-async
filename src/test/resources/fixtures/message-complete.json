@@ -1,0 +1,6 @@
+{
+  "collapse_key" : "collapse",
+  "time_to_live" : 10,
+  "delay_while_idle" : true,
+  "registration_ids" : ["1"]
+}
