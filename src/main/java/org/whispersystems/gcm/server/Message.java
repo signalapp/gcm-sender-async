@@ -52,6 +52,10 @@ public class Message {
     return objectMapper.writeValueAsString(requestEntity);
   }
 
+  /**
+   * Construct a new Message using a Builder.
+   * @return A new Builder.
+   */
   public static Builder newBuilder() {
     return new Builder();
   }
@@ -66,21 +70,39 @@ public class Message {
 
     private Builder() {}
 
+    /**
+     * @param collapseKey The GCM collapse key to use (optional).
+     * @return The Builder.
+     */
     public Builder withCollapseKey(String collapseKey) {
       this.collapseKey = collapseKey;
       return this;
     }
 
+    /**
+     * @param seconds The TTL (in seconds) for this message (optional).
+     * @return The Builder.
+     */
     public Builder withTtl(long seconds) {
       this.ttl = seconds;
       return this;
     }
 
+    /**
+     * @param delayWhileIdle Set GCM delay_while_idle (optional).
+     * @return The Builder.
+     */
     public Builder withDelayWhileIdle(boolean delayWhileIdle) {
       this.delayWhileIdle = delayWhileIdle;
       return this;
     }
 
+    /**
+     * Set a key in the GCM JSON payload delivered to the application (optional).
+     * @param key The key to set.
+     * @param value The value to set.
+     * @return The Builder.
+     */
     public Builder withDataPart(String key, String value) {
       if (data == null) {
         data = new HashMap<>();
@@ -89,12 +111,22 @@ public class Message {
       return this;
     }
 
+    /**
+     * Set the destination GCM registration ID (mandatory).
+     * @param registrationId The destination GCM registration ID.
+     * @return The Builder.
+     */
     public Builder withDestination(String registrationId) {
       this.registrationIds.clear();
       this.registrationIds.add(registrationId);
       return this;
     }
 
+    /**
+     * Construct a message object.
+     *
+     * @return An immutable message object, as configured by this builder.
+     */
     public Message build() {
       if (registrationIds.isEmpty()) {
         throw new IllegalArgumentException("You must specify a destination!");

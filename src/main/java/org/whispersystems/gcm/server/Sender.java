@@ -42,6 +42,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * The main interface to sending GCM messages.  Thread safe.
+ *
+ * @author Moxie Marlinspike
+ */
 public class Sender {
 
   private static final String PRODUCTION_URL = "https://android.googleapis.com/gcm/send";
@@ -51,10 +56,21 @@ public class Sender {
   private final RetryExecutor            executor;
   private final String                   url;
 
+  /**
+   * Construct a Sender instance.
+   *
+   * @param apiKey Your application's GCM API key.
+   */
   public Sender(String apiKey) {
     this(apiKey, 10);
   }
 
+  /**
+   * Construct a Sender instance with a specified retry count.
+   *
+   * @param apiKey Your application's GCM API key.
+   * @param retryCount The number of retries to attempt on a network error or 500 response.
+   */
   public Sender(String apiKey, int retryCount) {
     this(apiKey, retryCount, PRODUCTION_URL);
   }
@@ -82,10 +98,23 @@ public class Sender {
     this.client.start();
   }
 
+  /**
+   * Asynchronously send a message.
+   *
+   * @param message The message to send.
+   * @return A future.
+   */
   public ListenableFuture<Result> send(Message message) {
     return send(message, null);
   }
 
+  /**
+   * Asynchronously send a message with a context to be passed in the future result.
+   *
+   * @param message The message to send.
+   * @param requestContext An opaque context to include the future result.
+   * @return The future.
+   */
   public ListenableFuture<Result> send(final Message message, final Object requestContext) {
     return executor.getFutureWithRetry(new RetryCallable<ListenableFuture<Result>>() {
       @Override
@@ -104,6 +133,10 @@ public class Sender {
     });
   }
 
+  /**
+   * Shut down all existing HTTP connections.
+   * @throws IOException
+   */
   public void stop() throws IOException {
     this.client.close();
   }
