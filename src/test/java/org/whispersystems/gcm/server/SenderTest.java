@@ -1,14 +1,11 @@
 package org.whispersystems.gcm.server;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
 import com.squareup.okhttp.mockwebserver.rule.MockWebServerRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -16,9 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.whispersystems.gcm.server.util.FixtureHelpers.fixture;
 import static org.whispersystems.gcm.server.util.JsonHelpers.jsonFixture;
 
@@ -179,6 +174,4 @@ public class SenderTest {
     assertFalse(result.isThrottled());
     assertEquals(result.getError(), "NotRegistered");
   }
-
-
 }
