@@ -32,22 +32,24 @@ public class Message {
   private final String              collapseKey;
   private final Long                ttl;
   private final Boolean             delayWhileIdle;
+  private final Map<String, String> notification;
   private final Map<String, String> data;
   private final List<String>        registrationIds;
 
   private Message(String collapseKey, Long ttl, Boolean delayWhileIdle,
-                  Map<String, String> data, List<String> registrationIds)
+                  Map<String, String> notification, Map<String, String> data, List<String> registrationIds)
   {
     this.collapseKey     = collapseKey;
     this.ttl             = ttl;
     this.delayWhileIdle  = delayWhileIdle;
+    this.notification    = notification;
     this.data            = data;
     this.registrationIds = registrationIds;
   }
 
   public String serialize() throws JsonProcessingException {
     GcmRequestEntity requestEntity = new GcmRequestEntity(collapseKey, ttl, delayWhileIdle,
-                                                          data, registrationIds);
+                                                          notification, data, registrationIds);
 
     return objectMapper.writeValueAsString(requestEntity);
   }
@@ -62,9 +64,23 @@ public class Message {
 
   public static class Builder {
 
+    private static final String NOTIFICATION_TITLE = "title";
+    private static final String NOTIFICATION_BODY = "body";
+    private static final String NOTIFICATION_ICON = "icon";
+    private static final String NOTIFICATION_SOUND = "sound";
+    private static final String NOTIFICATION_BADGE = "badge";
+    private static final String NOTIFICATION_TAG = "tag";
+    private static final String NOTIFICATION_COLOR = "color";
+    private static final String NOTIFICATION_CLICK_ACTION = "click_action";
+    private static final String NOTIFICATION_TITLE_LOC_KEY = "title_loc_key";
+    private static final String NOTIFICATION_TITLE_LOC_ARGS = "title_loc_args";
+    private static final String NOTIFICATION_BODY_LOC_KEY = "body_loc_key";
+    private static final String NOTIFICATION_BODY_LOC_ARGS = "body_loc_args";
+
     private String              collapseKey     = null;
     private Long                ttl             = null;
     private Boolean             delayWhileIdle  = null;
+    private Map<String, String> notification    = null;
     private Map<String, String> data            = null;
     private List<String>        registrationIds = new LinkedList<>();
 
@@ -94,6 +110,128 @@ public class Message {
      */
     public Builder withDelayWhileIdle(boolean delayWhileIdle) {
       this.delayWhileIdle = delayWhileIdle;
+      return this;
+    }
+
+    /**
+     * Set the title in the notification payload automatically displayed by GCM (optional).
+     * @param title The title to set.
+     * @return The Builder.
+     */
+    public Builder withNotificationTitle(String title) {
+      return withNotificationPart(NOTIFICATION_TITLE, title);
+    }
+
+    /**
+     * Set the body in the notification payload automatically displayed by GCM (optional).
+     * @param body The body to set.
+     * @return The Builder.
+     */
+    public Builder withNotificationBody(String body) {
+      return withNotificationPart(NOTIFICATION_BODY, body);
+    }
+
+    /**
+     * Set the icon in the notification payload automatically displayed by GCM (optional).
+     * @param icon The icon to set.
+     * @return The Builder.
+     */
+    public Builder withNotificationIcon(String icon) {
+      return withNotificationPart(NOTIFICATION_ICON, icon);
+    }
+
+    /**
+     * Set the sound in the notification payload automatically displayed by GCM (optional).
+     * @param sound The sound to set.
+     * @return The Builder.
+     */
+    public Builder withNotificationSound(String sound) {
+      return withNotificationPart(NOTIFICATION_SOUND, sound);
+    }
+
+    /**
+     * Set the badge in the notification payload automatically displayed by GCM (optional).
+     * @param badge The badge to set.
+     * @return The Builder.
+     */
+    public Builder withNotificationBadge(String badge) {
+      return withNotificationPart(NOTIFICATION_BADGE, badge);
+    }
+
+    /**
+     * Set the tag in the notification payload automatically displayed by GCM (optional).
+     * @param tag The tag to set.
+     * @return The Builder.
+     */
+    public Builder withNotificationTag(String tag) {
+      return withNotificationPart(NOTIFICATION_TAG, tag);
+    }
+
+    /**
+     * Set the color in the notification payload automatically displayed by GCM (optional).
+     * @param color The color to set.
+     * @return The Builder.
+     */
+    public Builder withNotificationColor(String color) {
+      return withNotificationPart(NOTIFICATION_COLOR, color);
+    }
+
+    /**
+     * Set the click_action in the notification payload automatically displayed by GCM (optional).
+     * @param clickAction The click_action to set.
+     * @return The Builder.
+     */
+    public Builder withNotificationClickAction(String clickAction) {
+      return withNotificationPart(NOTIFICATION_CLICK_ACTION, clickAction);
+    }
+
+    /**
+     * Set the title_loc_key in the notification payload automatically displayed by GCM (optional).
+     * @param titleLocKey The title_loc_key to set.
+     * @return The Builder.
+     */
+    public Builder withNotificationTitleLocKey(String titleLocKey) {
+      return withNotificationPart(NOTIFICATION_TITLE_LOC_KEY, titleLocKey);
+    }
+
+    /**
+     * Set the title_loc_args in the notification payload automatically displayed by GCM (optional).
+     * @param titleLocArgs The title_loc_args to set.
+     * @return The Builder.
+     */
+    public Builder withNotificationTitleLocArgs(String titleLocArgs) {
+      return withNotificationPart(NOTIFICATION_TITLE_LOC_ARGS, titleLocArgs);
+    }
+
+    /**
+     * Set the body_loc_key in the notification payload automatically displayed by GCM (optional).
+     * @param bodyLocKey The body_loc_key to set.
+     * @return The Builder.
+     */
+    public Builder withNotificationBodyLocKey(String bodyLocKey) {
+      return withNotificationPart(NOTIFICATION_BODY_LOC_KEY, bodyLocKey);
+    }
+
+    /**
+     * Set body_loc_args in the notification payload automatically displayed by GCM (optional).
+     * @param bodyLocArgs The body_loc_args to set.
+     * @return The Builder.
+     */
+    public Builder withNotificationBodyLocArgs(String bodyLocArgs) {
+      return withNotificationPart(NOTIFICATION_BODY_LOC_ARGS, bodyLocArgs);
+    }
+
+    /**
+     * Set a key in the notification payload automatically displayed by GCM (optional).
+     * @param key The key to set.
+     * @param value The value to set.
+     * @return The Builder.
+     */
+    private Builder withNotificationPart(String key, String value) {
+      if (notification == null) {
+        notification = new HashMap<>();
+      }
+      notification.put(key, value);
       return this;
     }
 
@@ -132,7 +270,7 @@ public class Message {
         throw new IllegalArgumentException("You must specify a destination!");
       }
 
-      return new Message(collapseKey, ttl, delayWhileIdle, data, registrationIds);
+      return new Message(collapseKey, ttl, delayWhileIdle, notification, data, registrationIds);
     }
   }
 

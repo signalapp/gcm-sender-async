@@ -1,0 +1,17 @@
+{
+  "notification" : {
+    "badge" : "badge",
+    "title_loc_args" : "title-loc-args",
+    "body_loc_args" : "body-loc-args",
+    "color" : "color",
+    "sound" : "sound",
+    "icon" : "icon",
+    "tag" : "tag",
+    "title_loc_key" : "title-loc-key",
+    "title" : "title",
+    "body" : "body",
+    "click_action" : "click-action",
+    "body_loc_key" : "body-loc-key"
+  },
+  "registration_ids" : ["3"]
+}
