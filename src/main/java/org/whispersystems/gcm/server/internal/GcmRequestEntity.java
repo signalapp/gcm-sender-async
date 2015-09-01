@@ -35,18 +35,22 @@ public class GcmRequestEntity {
   @JsonProperty(value = "delay_while_idle")
   private Boolean delayWhileIdle;
 
+  @JsonProperty(value = "notification")
+  private Map<String, String> notification;
+
   @JsonProperty(value = "data")
   private Map<String, String> data;
 
   @JsonProperty(value = "registration_ids")
   private List<String> registrationIds;
 
-  public GcmRequestEntity(String collapseKey, Long ttl, Boolean delayWhileIdle,
+  public GcmRequestEntity(String collapseKey, Long ttl, Boolean delayWhileIdle, Map<String, String> notification,
                           Map<String, String> data, List<String> registrationIds)
   {
     this.collapseKey     = collapseKey;
     this.ttl             = ttl;
     this.delayWhileIdle  = delayWhileIdle;
+    this.notification    = notification;
     this.data            = data;
     this.registrationIds = registrationIds;
   }
