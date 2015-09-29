@@ -25,6 +25,7 @@ public class MessageTest {
                              .withCollapseKey("collapse")
                              .withDelayWhileIdle(true)
                              .withTtl(10)
+                             .withPriority("high")
                              .build();
 
     assertEquals(message.serialize(), jsonFixture("fixtures/message-complete.json"));

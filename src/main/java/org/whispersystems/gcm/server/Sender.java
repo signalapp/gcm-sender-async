@@ -36,6 +36,7 @@ import org.apache.http.util.EntityUtils;
 import org.whispersystems.gcm.server.internal.GcmResponseEntity;
 import org.whispersystems.gcm.server.internal.GcmResponseListEntity;
 
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executors;
