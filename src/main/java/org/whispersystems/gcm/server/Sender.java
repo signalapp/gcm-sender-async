@@ -124,7 +124,7 @@ public class Sender {
 
         request.setHeader("Authorization", authorizationHeader);
         request.setEntity(new StringEntity(message.serialize(),
-                                           ContentType.parse("application/json")));
+                                           ContentType.parse("application/json; charset=utf-8")));
 
         client.execute(request, new ResponseHandler(future, requestContext));
 
