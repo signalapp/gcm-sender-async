@@ -46,7 +46,7 @@ public class SenderTest {
     assertEquals(request.getPath(), "/gcm/send");
     assertEquals(new String(request.getBody()), jsonFixture("fixtures/message-minimal.json"));
     assertEquals(request.getHeader("Authorization"), "key=foobarbaz");
-    assertEquals(request.getHeader("Content-Type"), "application/json");
+    assertEquals(request.getHeader("Content-Type"), "application/json; charset=utf-8");
     assertEquals(server.getRequestCount(), 1);
   }
 
