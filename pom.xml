@@ -36,7 +36,7 @@
     </scm>
 
     <properties>
-        <jackson.api.version>2.3.3</jackson.api.version>
+        <jackson.api.version>2.9.6</jackson.api.version>
         <async-http-client.version>1.9.3</async-http-client.version>
     </properties>
 
