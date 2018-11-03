@@ -27,25 +27,25 @@ Add to your pom:
 String apiKey = "<myGcmApiKey>";
 Sender sender = new Sender(apiKey);
 
-ListenableFuture<Result> future = sender.send(Message.newBuilder()
-                                                     .withDestination("<registration_id>")
-                                                     .withDataPart("message", "hello world!");
+        ListenableFuture<Result> future = sender.send(Message.newBuilder()
+                .withDestination("<registration_id>")
+                .withDataPart("message", "hello world!").build());
 
-Futures.addCallback(future, new FutureCallback<Result>() {
-  @Override
-  public void onSuccess(Result result) {
-    if (result.isSuccess()) {
-      // Maybe do something with result.getMessageId()
-    } else {
-      // Maybe do something with result.getError(), or check result.isUnregistered, etc..
-    }
-  }
+        Futures.addCallback(future, new FutureCallback<Result>() {
+            @Override
+            public void onSuccess(Result result) {
+                if (result.isSuccess()) {
+                    // Maybe do something with result.getMessageId()
+                } else {
+                    // Maybe do something with result.getError(), or check result.isUnregistered, etc..
+                }
+            }
 
-  @Override
-  public void onFailure(Throwable throwable) {
-    // Handle network failure or server 500
-  }
-}
+            @Override
+            public void onFailure(Throwable throwable) {
+                // Handle network failure or server 500
+            }
+        });
 ```
 
 License
