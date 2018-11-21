@@ -16,44 +16,35 @@
  */
 package org.whispersystems.gcm.server;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.whispersystems.gcm.server.internal.GcmRequestEntity;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class Message {
+import org.whispersystems.gcm.server.internal.AndroidConfig;
+import org.whispersystems.gcm.server.internal.AndroidNotification;
+import org.whispersystems.gcm.server.internal.FcmReqMessage;
+import org.whispersystems.gcm.server.internal.FcmRequestEntity;
+import org.whispersystems.gcm.server.internal.Notification;
 
-  private static final ObjectMapper objectMapper = new ObjectMapper();
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-  private final String              collapseKey;
-  private final Long                ttl;
-  private final Boolean             delayWhileIdle;
-  private final Map<String, String> data;
-  private final List<String>        registrationIds;
-  private final String              priority;
+public abstract class Message {
 
-  private Message(String collapseKey, Long ttl, Boolean delayWhileIdle,
-                  Map<String, String> data, List<String> registrationIds,
-                  String priority)
-  {
-    this.collapseKey     = collapseKey;
-    this.ttl             = ttl;
-    this.delayWhileIdle  = delayWhileIdle;
-    this.data            = data;
-    this.registrationIds = registrationIds;
-    this.priority        = priority;
-  }
+  protected static final ObjectMapper objectMapper = new ObjectMapper();
 
-  public String serialize() throws JsonProcessingException {
-    GcmRequestEntity requestEntity = new GcmRequestEntity(collapseKey, ttl, delayWhileIdle,
-                                                          data, registrationIds, priority);
+  
+	
 
-    return objectMapper.writeValueAsString(requestEntity);
-  }
+	public Message(){
+		
+	};
+	
+
+  public abstract String serialize() throws JsonProcessingException ;
+  
+  
 
   /**
    * Construct a new Message using a Builder.
@@ -71,7 +62,26 @@ public class Message {
     private Map<String, String> data            = null;
     private List<String>        registrationIds = new LinkedList<>();
     private String              priority        = null;
-
+	private String 				token = null;
+	private String 				condition = null;
+	private String 				topic = null;
+	private String 				title = null;
+	private String 				body = null;
+	private String 				android_channel_id = null;
+	private String 				icon = null;
+	private String 				sound = null;
+	private String 				tag = null;
+	private String 				click_action = null;
+	private String 				color = null;
+	private String 				body_loc_key = null;
+	private String 				title_loc_key = null;
+	private List<String> 		body_loc_args = new LinkedList<>();
+	private List<String> 		title_loc_args = new LinkedList<>();
+	private boolean             isFcm = false;
+	private FcmRequestEntity 	fcmEntity = null;
+	private String 				collapse_key = null;
+	private String 				name = null;
+    
     private Builder() {}
 
     /**
@@ -137,6 +147,40 @@ public class Message {
       this.priority = priority;
       return this;
     }
+    
+	public Builder withTitle(String string) {
+		this.title = string;
+		return this;
+	}
+
+	public Builder withBody(String string) {
+		this.body = string;
+		return this;
+	}
+	
+	public Builder flagFcm() {
+		this.isFcm = true;
+		return this;
+	}
+	
+	public Builder withToken(String token) {
+		this.token = token;
+		return this;
+	}
+	
+	public Builder withData(Map<String, String> data) {
+		if (this.data == null) {
+			this.data = new HashMap<>();
+        }
+		this.data.putAll(data);
+		return this;
+	}
+	
+	public Builder withSound(String sound) {
+		this.sound = sound;
+		return this;
+	}
+
 
     /**
      * Construct a message object.
@@ -144,12 +188,44 @@ public class Message {
      * @return An immutable message object, as configured by this builder.
      */
     public Message build() {
-      if (registrationIds.isEmpty()) {
+      if (registrationIds.isEmpty() && this.token.isEmpty()) {
         throw new IllegalArgumentException("You must specify a destination!");
       }
-
-      return new Message(collapseKey, ttl, delayWhileIdle, data, registrationIds, priority);
+      if(this.isFcm) {
+    	  if(null == fcmEntity) {
+    		  fcmEntity = new FcmRequestEntity(
+    				  new FcmReqMessage(
+    						  name, 
+    						  data, 
+    						  new Notification(
+    								  title, body
+    								  ), 
+    						  new AndroidConfig(
+    								  collapse_key, priority, ttl==null?null:Long.toString(ttl), data,
+    									new AndroidNotification(
+    											title, body, icon, color,  sound, tag,
+    											click_action, body_loc_key, title_loc_key, body_loc_args,
+    											title_loc_args	
+											)
+    								  ),
+    						  token, 
+    						  topic, 
+    						  condition
+					    )
+    				  );
+    	  }
+    	  return new FcmMessageSerializer(fcmEntity);
+      }
+      return new GcmMessage( collapseKey, ttl, delayWhileIdle,
+    		  data, registrationIds,
+    		  priority);
     }
+
+	public Builder withFcmMessage(FcmRequestEntity fcmEntity) {
+		this.flagFcm();
+		this.fcmEntity = fcmEntity;
+		return this;
+	}
   }
 
 

@@ -33,6 +33,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.util.EntityUtils;
+import org.whispersystems.gcm.server.internal.FcmResponseEntity;
 import org.whispersystems.gcm.server.internal.GcmResponseEntity;
 import org.whispersystems.gcm.server.internal.GcmResponseListEntity;
 
@@ -50,7 +51,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class Sender {
 
-  private static final String PRODUCTION_URL = "https://android.googleapis.com/gcm/send";
+  private static final String PRODUCTION_URL = "https://fcm.googleapis.com/fcm/send";
 
   private final CloseableHttpAsyncClient client;
   private final String                   authorizationHeader;
@@ -78,10 +79,16 @@ public class Sender {
 
   @VisibleForTesting
   public Sender(String apiKey, int retryCount, String url) {
+	  this(apiKey, retryCount, url, 
+			  url.contains("projects") ? String.format("Bearer %s", apiKey):String.format("key=%s", apiKey)
+					  );
+  }
+  
+  private Sender(String apiKey, int retryCount, String url, String authorizationHeader) {
     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     this.url                 = url;
-    this.authorizationHeader = String.format("key=%s", apiKey);
+    this.authorizationHeader = authorizationHeader;
 
     this.client = HttpAsyncClients.custom()
                                   .setMaxConnTotal(100)
@@ -98,6 +105,8 @@ public class Sender {
 
     this.client.start();
   }
+  
+  
 
   /**
    * Asynchronously send a message.
@@ -186,6 +195,14 @@ public class Sender {
     }
 
     private Result parseResult(String body) throws IOException {
+      if(body.isEmpty() == false && body.contains("name")) {//fcm response field
+          FcmResponseEntity fcmResponseEntity =  objectMapper.readValue(body, FcmResponseEntity.class);
+          return new Result(this.requestContext, 
+        		  null ,
+        		  fcmResponseEntity.getName(), 
+        		  null
+        		  );
+      } 
       List<GcmResponseEntity> responseList = objectMapper.readValue(body, GcmResponseListEntity.class)
                                                          .getResults();
 
